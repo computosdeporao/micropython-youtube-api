@@ -53,6 +53,8 @@ class YoutubeAPI:
         self._comments = 0
         self._videos = 0
 
+        self.last_status = 0
+
     def __enter__(self):
         return self
 
@@ -74,13 +76,16 @@ class YoutubeAPI:
 
         # request the data from Google
         req = ureq.get(youtube_url)
-        if req.status_code == 200:
+        self.last_status = req.status_code
+        if self.last_status == 200:
+            response = req.json()
+            #print("Response: ", response)
             stats = [{
                     'subs': stat['statistics']['subscriberCount'], 
                     'views': stat['statistics']['viewCount'],
                     'videos': stat['statistics']['videoCount'],
                     'comments': stat['statistics']['commentCount']
-                    } for stat in req.json()['items']]
+                    } for stat in response['items']]
                 
             # for stat in YoutubeApi.stats
             self._subs = stats[0]['subs']
