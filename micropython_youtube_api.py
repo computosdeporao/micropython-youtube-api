@@ -88,10 +88,10 @@ class YoutubeAPI:
                     } for stat in response['items']]
                 
             # for stat in YoutubeApi.stats
-            self._subs = stats[0]['subs']
-            self._views = stats[0]['views']
-            self._videos = stats[0]['videos']
-            self._comments = stats[0]['comments']         
+            self._subs = stats[0].get('subs', 0)
+            self._views = stats[0].get('views', 0)
+            self._videos = stats[0].get('videos', 0)
+            self._comments = stats[0].get('comments', 0)
         else:
             print( "ERROR: status_code: " + str(req.status_code) )
         req.close()
