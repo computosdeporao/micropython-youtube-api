@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 
 """
-`micropython_youtube_api` - YouTube API 
+`micropython_youtube_api` - YouTube API
 ====================================================
 See examples folder for how to use
 * Author(s): Seon Rozenblum
@@ -30,11 +30,12 @@ See examples folder for how to use
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/unexpectedmaker/micropython-youtube-api"
 
+import time
+
 import urequests as ureq
-import json, time
+
 
 class YoutubeAPI:
-
     def __init__(self, channel_id, app_key_id, query_interval_sec=60):
         if not isinstance(channel_id, str):
             raise TypeError("'channel_id' must be provided")
@@ -70,32 +71,35 @@ class YoutubeAPI:
     def _grab_stats(self):
         # Create the API query to send to GoogleAPI
         urlbase = "https://www.googleapis.com/youtube/v3/channels"
-        youtube_url = "{}?part=statistics&id={}&key={}".format(urlbase, self.channel_id, self.app_key_id )
+        youtube_url = "{}?part=statistics&id={}&key={}".format(urlbase, self.channel_id, self.app_key_id)
 
-        #print ("Contacting GoogleAPI... " )
+        # print ("Contacting GoogleAPI... " )
 
         # request the data from Google
         req = ureq.get(youtube_url)
         self.last_status = req.status_code
         if self.last_status == 200:
             response = req.json()
-            #print("Response: ", response)
-            stats = [{
-                    'subs': stat['statistics']['subscriberCount'], 
+            # print("Response: ", response)
+            stats = [
+                {
+                    'subs': stat['statistics']['subscriberCount'],
                     'views': stat['statistics']['viewCount'],
                     'videos': stat['statistics']['videoCount'],
-                    'comments': stat['statistics']['commentCount']
-                    } for stat in response['items']]
-                
+                    'comments': stat['statistics']['commentCount'],
+                }
+                for stat in response['items']
+            ]
+
             # for stat in YoutubeApi.stats
             self._subs = stats[0].get('subs', 0)
             self._views = stats[0].get('views', 0)
             self._videos = stats[0].get('videos', 0)
             self._comments = stats[0].get('comments', 0)
         else:
-            print( "ERROR: status_code: " + str(req.status_code) )
+            print("ERROR: status_code: " + str(req.status_code))
         req.close()
-    
+
     # Accessorss for each of the stats returned by the API
     @property
     def subs(self):
